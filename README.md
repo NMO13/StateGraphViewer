@@ -5,3 +5,5 @@ This DSL is a text-based programming language for the modeling of state transiti
 In course of this thesis work a system–called StateGraphViewer has been developed which generates a graphical representation out of these text-based finite automaton specifications. One important property of this system is that the graphical layout is generated automatically. Therefore 
 StateGraphViewer implements special layout algorithms to realize this layout process. 
 StateGraphViewer is implemented as an Eclipse plugin and supports the automatic process of text-based finite automata. 
+
+![Alt text](1.1.png?raw=true "Optional Title")

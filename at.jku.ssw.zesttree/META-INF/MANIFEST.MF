@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Zesttree Plug-in
+Bundle-SymbolicName: at.jku.ssw.zesttree;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: at.jku.ssw.zesttree.activator.ZestTreePlugin
+Bundle-Vendor: SSW - Institute for Systems Software
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.draw2d;bundle-version="3.4.0",
+ org.eclipse.zest;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Export-Package: at.jku.ssw.zesttree,
+ at.jku.ssw.zesttree.activator,
+ at.jku.ssw.zesttree.layout,
+ at.jku.ssw.zesttree.listeners,
+ at.jku.ssw.zesttree.providers,
+ at.jku.ssw.zesttree.widgets

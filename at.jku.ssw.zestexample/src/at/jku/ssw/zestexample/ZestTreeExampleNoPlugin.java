@@ -1,0 +1,155 @@
+package at.jku.ssw.zestexample;
+
+import java.awt.Dimension;
+import java.awt.Toolkit;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+
+import at.jku.ssw.zestexample.testmodel.TestElem;
+import at.jku.ssw.zestexample.testmodel.TestElemContentProvider;
+import at.jku.ssw.zestexample.testmodel.TestElemLabelProvider;
+import at.jku.ssw.zestexample.testmodel.TestModel;
+import at.jku.ssw.zesttree.VisualTreeViewer;
+import at.jku.ssw.zesttree.providers.SimpleTree2GraphProvider;
+
+/*
+ * TODO's: 
+ * FIX: incorrect positioning of "61" has either to do with the 
+ * 		sibling shift or the parent centering --> at the 
+ * 		"shiftRestTree" - part.
+ * 
+ * TODO generally:
+ * FIX: horizontal view switch should also reset the anchors to the 
+ * 		horizontal version and vice versa
+ * FIX: horizontal view incorrect if element below center is 
+ * 		expanded / collapsed
+ * ADD: group symbol for leafing / cur should not be reset
+ */
+public class ZestTreeExampleNoPlugin {
+
+	private static Display d;
+	private Shell shell;
+	VisualTreeViewer tree;
+
+	private Image[] images;
+
+	public ZestTreeExampleNoPlugin() {
+
+		d = new Display();
+		shell = new Shell(d);
+		shell.setText("Zest TreeLayout Test with Model");
+		shell.setLayout(new FillLayout(SWT.VERTICAL));
+		shell.setLocation(100, 50);
+
+		// obsolete within plug-in
+		shell.addControlListener(new ControlAdapter() {
+
+			@Override
+			public void controlResized(ControlEvent e) {
+
+				if(tree != null && tree.getInternViewer() != null) {
+					tree.getInternViewer().applyLayout();
+				}
+			}
+		});
+		shell.setFocus();
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		shell.setSize(dim.height, dim.height - 150);
+
+		TestModel model = createTestModel();
+
+		VisualTreeViewer tree = new VisualTreeViewer(shell);
+
+//		Tree2GraphProvider adapter = new Tree2GraphProvider(
+//				new TestElemContentProvider(), new TestElemLabelProvider(),
+//				new TestElemEntityStyleProvider(),
+//				new TestElemConnectionStyleProvider());
+
+		SimpleTree2GraphProvider adapter = new SimpleTree2GraphProvider(
+				new TestElemContentProvider(), new TestElemLabelProvider());
+
+		tree.setContentProvider(adapter);
+		tree.setLabelProvider(adapter);
+//		tree.setInput(model);
+		tree.setInput(createHugeTestModel(0));
+
+		shell.open();
+
+		while(!shell.isDisposed()) {
+			while(!d.readAndDispatch()) {
+				d.sleep();
+			}
+		}
+		disposeImages();
+	}
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+
+		new ZestTreeExampleNoPlugin();
+	}
+
+	private TestModel createTestModel(boolean... bigModel) {
+
+		images = new Image[] { getImage("g1.gif"), getImage("g21.gif"),
+				getImage("g22.gif"), getImage("g23.gif"), getImage("g24.gif"),
+				getImage("g25.gif"), getImage("g26.gif"), getImage("g31.gif"),
+				getImage("g32.gif"), getImage("g33.gif"), getImage("g34.gif"),
+				getImage("g35.gif"), getImage("g36.gif"), getImage("g37.gif"),
+				getImage("g38.gif"), getImage("g39.gif"), getImage("g310.gif"),
+				getImage("g311.gif"), getImage("g41.gif"), getImage("g42.gif"),
+				getImage("g43.gif"), getImage("g44.gif"), getImage("g45.gif"),
+				getImage("g46.gif"), getImage("g47.gif"), getImage("g48.gif"),
+				getImage("g49.gif"), getImage("g410.gif"),
+				getImage("g411.gif"), getImage("g412.gif"),
+				getImage("g413.gif"), getImage("g414.gif"),
+				getImage("g51.gif"), getImage("g52.gif"), getImage("g53.gif"),
+				getImage("g54.gif"), getImage("g55.gif") };
+		return new TestModel("Root", images, bigModel.length == 1
+				&& bigModel[0]);
+	}
+
+	private TestElem createHugeTestModel(int count) {
+
+		TestElem root = getEmptyInstance();
+		if(count <= 10) {
+			if(Math.random() < 1 - count / 10) {
+				for(int i = 0; i < 4; i++) {
+					if(Math.random() < 0.5) {
+						root.add(createHugeTestModel(count + 1));
+					}
+				}
+			}
+		}
+		return root;
+	}
+
+	private TestElem getEmptyInstance() {
+
+		return new TestElem("", null);
+	}
+
+	private void disposeImages() {
+
+		for(Image i : images) {
+			i.dispose();
+		}
+	}
+
+	private static Image getImage(final String path) {
+
+		try {
+			return new Image(d, "icons/" + path);
+		} catch(Exception e) {
+			return null;
+		}
+	}
+}

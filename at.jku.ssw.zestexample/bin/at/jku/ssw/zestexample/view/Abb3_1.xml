@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<StateModels>
+<Statemodel name="Coolant_temp">
+<State name="Cold"/>
+<State name="Warm"/>
+<State name="Hot"/>
+<State name="Critical"/>
+<Transition>
+<source>
+<State name="Critical"/>
+</source>
+<target>
+<State name="Cold"/>
+</target>
+</Transition>
+<Transition>
+<source>
+<State name="Hot"/>
+</source>
+<target>
+<State name="Cold"/>
+</target>
+</Transition>
+<Transition>
+<source>
+<State name="Cold"/>
+</source>
+<target>
+<State name="Warm"/>
+</target>
+<condition value="coolant_temp &gt;= 62.5 &amp;&amp; coolant_temp &lt; 87.5"/>
+</Transition>
+<Transition>
+<source>
+<State name="Warm"/>
+</source>
+<target>
+<State name="Cold"/>
+</target>
+<condition value="coolant_temp &lt; 57.5"/>
+</Transition>
+<Transition>
+<source>
+<State name="Warm"/>
+</source>
+<target>
+<State name="Hot"/>
+</target>
+<condition value="coolant_temp &gt;= 87.5 &amp;&amp; coolant_temp &lt; 97.5"/>
+</Transition>
+<Transition>
+<source>
+<State name="Hot"/>
+</source>
+<target>
+<State name="Warm"/>
+</target>
+<condition value="coolant_temp &gt;= 57.5 &amp;&amp; coolant_temp &lt; 82.5"/>
+</Transition>
+<Transition>
+<source>
+<State name="Hot"/>
+</source>
+<target>
+<State name="Critical"/>
+</target>
+<condition value="coolant_temp &gt;= 97.5"/>
+</Transition>
+<!--Transition>
+<source>
+<State name="Critical"/>
+</source>
+<target>
+<State name="Hot"/>
+</target>
+<condition value="coolant_temp &gt;= 82.5 &amp;&amp; coolant_temp &lt; 92.5"/>
+</Transition-->
+</Statemodel>
+</StateModels>

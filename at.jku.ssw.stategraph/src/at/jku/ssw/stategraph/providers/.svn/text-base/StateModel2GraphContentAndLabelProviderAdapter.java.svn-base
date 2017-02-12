@@ -1,0 +1,224 @@
+package at.jku.ssw.stategraph.providers;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.draw2d.IFigure;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.zest.core.viewers.IConnectionStyleProvider;
+import org.eclipse.zest.core.viewers.IEntityStyleProvider;
+import org.eclipse.zest.core.viewers.IGraphContentProvider;
+
+import at.jku.ssw.stategraph.testmodel.StateModelNode;
+import cgimodel.BaseState;
+import cgimodel.OrState;
+import cgimodel.State;
+import cgimodel.StateModel;
+import cgimodel.StateModels;
+
+
+
+public class StateModel2GraphContentAndLabelProviderAdapter implements IGraphContentProvider, 
+																ILabelProvider, IEntityStyleProvider,
+																IConnectionStyleProvider{
+
+	private Relation[] relArray;
+	private List<Relation> relList;
+	private IEntityStyleProvider styleProvider;
+	
+	public StateModel2GraphContentAndLabelProviderAdapter(IEntityStyleProvider styleProvider) {
+		relList = new ArrayList<Relation>();
+		this.styleProvider = styleProvider;
+	}
+	
+	@Override
+	public void dispose() {
+		styleProvider.dispose();
+		
+	}
+
+	@Override
+	public void inputChanged(Viewer arg0, Object arg1, Object arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void addListener(ILabelProviderListener arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isLabelProperty(Object arg0, String arg1) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void removeListener(ILabelProviderListener arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Image getImage(Object arg0) {
+		try {
+			/*ImageDescriptor i = ZestTreeExamplePlugin.getImageDescriptor("/icons/g21.gif");
+
+			return ImageDescriptor.createFromImageData(
+					i.getImageData().scaledTo(16, 16)).createImage();
+//			return i.createImage();*/
+			return null;
+		} catch(Exception e) {
+			return null;
+		}
+	}
+
+	@Override
+	public String getText(Object arg0) {
+		if(arg0 instanceof StateModelNode) {
+			return (String) ((StateModelNode)arg0).getValue().toString();
+		}
+		
+		return null;
+	}
+
+	@Override
+	public Object getSource(Object o) {
+		if(o instanceof Relation) {
+			Object n = ((Relation) o).getSource();
+			return n;
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public Object getDestination(Object o) {
+		if(o instanceof Relation) {
+			Object n = ((Relation) o).getDestination();
+			return n;
+		} else {
+			return null;
+		}
+	}
+
+//	@Override
+//	public Object[] getElements(Object input) {
+//		StateModelNode[] nodes = model.getNodes();
+//		ArrayList<Relation> list = new ArrayList<Relation>();
+//		for(int i = 0; i < nodes.length; i++)
+//			for(int j = 0; j < nodes[i].getChildren().length; j++) {
+//				Relation r = new Relation(nodes[i], nodes[i].getChildren()[j]);
+//				list.add(r);
+//			}
+//		return list.toArray(new Relation[list.size()]);
+//	}
+	
+	@Override
+	public Object[] getElements(Object input) {
+		if(relArray == null) {
+//			for(int i = 0; i < sm.getStates().size(); i++) {
+//				relList.add(new Relation(input, sm));
+//			}
+//			for(int i = 0; i < sm.getStates().size(); i++) {
+//				
+//			}
+			createRelationsRec((StateModelNode)input);
+			relArray = relList.toArray(new Relation[relList.size()]);
+		}
+		return relArray;
+	}
+	
+	private void createRelationsRec(StateModelNode parent) {
+		// Firstly, create all relations between the parent and his children
+		for(int i = 0; i < parent.getChildren().length; i++)
+		{
+			relList.add(new Relation(parent, parent.getChildren()[i]));
+			// secondly, go recursively down and create relation between 
+			// a child and his child
+			createRelationsRec(parent.getChildren()[i]);
+		}
+		
+//		for(int i = 0; i < parent.getTargets().length; i++) {
+//			relList.add(new Relation(parent, parent.getTargets()[i]));
+//		}
+//		for(int i = 0; i < parent.getChildren().length; i++) {
+//			createRelationsRec(parent.getChildren()[i]);
+//		}
+	}
+
+	// IEntityStyleProvider
+	@Override
+	public Color getNodeHighlightColor(Object entity) {
+		return styleProvider.getBorderHighlightColor(entity);
+	}
+
+	@Override
+	public Color getBorderColor(Object entity) {
+		return styleProvider.getBorderColor(entity);
+	}
+
+	@Override
+	public Color getBorderHighlightColor(Object entity) {
+		return styleProvider.getBorderHighlightColor(entity);
+	}
+
+	@Override
+	public int getBorderWidth(Object entity) {
+		return styleProvider.getBorderWidth(entity);
+	}
+
+	@Override
+	public Color getBackgroundColour(Object entity) {
+		return styleProvider.getBackgroundColour(entity);
+	}
+
+	@Override
+	public Color getForegroundColour(Object entity) {
+		return styleProvider.getForegroundColour(entity);
+	}
+
+	@Override
+	public IFigure getTooltip(Object entity) {
+		return styleProvider.getTooltip(entity);
+	}
+
+	@Override
+	public boolean fisheyeNode(Object entity) {
+		return styleProvider.fisheyeNode(entity);
+	}
+
+	@Override
+	public int getConnectionStyle(Object rel) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public Color getColor(Object rel) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Color getHighlightColor(Object rel) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getLineWidth(Object rel) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	
+
+
+}

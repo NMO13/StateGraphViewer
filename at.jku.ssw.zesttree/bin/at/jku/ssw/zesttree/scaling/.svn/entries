@@ -1,0 +1,60 @@
+9
+
+dir
+0
+svn://ase.ssw.jku.at/zesttree/at.jku.ssw.zesttree/src/at/jku/ssw/zesttree/scaling
+svn://ase.ssw.jku.at/zesttree
+add
+
+
+
+
+
+
+
+svn:special svn:externals svn:needs-lock
+
+AbstractNodeScaler.java
+file
+
+
+
+add
+
+DefaultNodeScaler.java
+file
+
+
+
+add
+
+ScaleShape.java
+file
+
+
+
+add
+
+f8bab156de6955be2a0f2cc4f7c0148d
+
+
+
+has-props
+has-prop-mods
+
+
+
+
+
+
+copied
+svn://ase.ssw.jku.at/zesttree/at.jku.ssw.zesttree/src/at/jku/ssw/zesttree/shapes/ScaleShape.java
+17
+
+INodeScaler.java
+file
+
+
+
+add
+

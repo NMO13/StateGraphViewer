@@ -1,0 +1,3 @@
+- Wenn OR-States keine Namen gegeben werden wird das Infofeld nicht mehr richtig angezeigt: erledigt
+11.9
+- "Coolant_temp": Die Transition von Critical zu Hot stimmt nicht

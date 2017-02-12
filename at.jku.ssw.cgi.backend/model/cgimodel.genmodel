@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/at.jku.ssw.cgi.backend/src"
+    modelPluginID="at.jku.ssw.cgi.backend" modelName="Cgimodel" importerID="org.eclipse.emf.importer.ecore"
+    complianceLevel="6.0" copyrightFields="false">
+  <foreignModel>file:/C:/Users/flowqi/Desktop/cgimodel.ecore</foreignModel>
+  <genPackages prefix="Cgimodel" disposableProviderFactory="true" ecorePackage="cgimodel.ecore#/">
+    <genClasses image="false" ecoreClass="cgimodel.ecore#//Named">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cgimodel.ecore#//Named/name"/>
+    </genClasses>
+    <genClasses ecoreClass="cgimodel.ecore#//MultiValue">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cgimodel.ecore#//MultiValue/value"/>
+      <genOperations ecoreOperation="cgimodel.ecore#//MultiValue/getType"/>
+    </genClasses>
+    <genClasses ecoreClass="cgimodel.ecore#//Cgimodel">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cgimodel.ecore#//Cgimodel/consts"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cgimodel.ecore#//Cgimodel/signals"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cgimodel.ecore#//Cgimodel/stateModels"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cgimodel.ecore#//Cgimodel/uimodel"/>
+    </genClasses>
+    <genClasses ecoreClass="cgimodel.ecore#//Const"/>
+    <genClasses image="false" ecoreClass="cgimodel.ecore#//Data"/>
+    <genClasses ecoreClass="cgimodel.ecore#//Signal">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cgimodel.ecore#//Signal/default"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cgimodel.ecore#//Signal/range"/>
+    </genClasses>
+    <genClasses ecoreClass="cgimodel.ecore#//Range">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cgimodel.ecore#//Range/min"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cgimodel.ecore#//Range/max"/>
+    </genClasses>
+    <genClasses ecoreClass="cgimodel.ecore#//Structure">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cgimodel.ecore#//Structure/signals"/>
+    </genClasses>
+    <genClasses ecoreClass="cgimodel.ecore#//StateModel">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cgimodel.ecore#//StateModel/states"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cgimodel.ecore#//StateModel/transitions"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="cgimodel.ecore#//BaseState">
+      <genOperations ecoreOperation="cgimodel.ecore#//BaseState/isSet"/>
+    </genClasses>
+    <genClasses ecoreClass="cgimodel.ecore#//State">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cgimodel.ecore#//State/expr"/>
+      <genOperations ecoreOperation="cgimodel.ecore#//State/set">
+        <genParameters ecoreParameter="cgimodel.ecore#//State/set/value"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="cgimodel.ecore#//OrState">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cgimodel.ecore#//OrState/states"/>
+    </genClasses>
+    <genClasses ecoreClass="cgimodel.ecore#//Transition">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference cgimodel.ecore#//Transition/source"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference cgimodel.ecore#//Transition/target"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cgimodel.ecore#//Transition/condition"/>
+      <genOperations ecoreOperation="cgimodel.ecore#//Transition/perform"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="cgimodel.ecore#//Expression">
+      <genOperations ecoreOperation="cgimodel.ecore#//Expression/evaluateBool"/>
+      <genOperations ecoreOperation="cgimodel.ecore#//Expression/evaluateNum"/>
+      <genOperations ecoreOperation="cgimodel.ecore#//Expression/isBool"/>
+      <genOperations ecoreOperation="cgimodel.ecore#//Expression/isValid"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="cgimodel.ecore#//BinaryExpression">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cgimodel.ecore#//BinaryExpression/leftExpr"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cgimodel.ecore#//BinaryExpression/rightExpr"/>
+    </genClasses>
+    <genClasses ecoreClass="cgimodel.ecore#//OrExpression"/>
+    <genClasses ecoreClass="cgimodel.ecore#//AndExpression"/>
+    <genClasses ecoreClass="cgimodel.ecore#//BinaryOpExpression">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cgimodel.ecore#//BinaryOpExpression/binaryOp"/>
+    </genClasses>
+    <genClasses ecoreClass="cgimodel.ecore#//UnaryExpression">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cgimodel.ecore#//UnaryExpression/expr"/>
+    </genClasses>
+    <genClasses ecoreClass="cgimodel.ecore#//UnaryOpExpression">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cgimodel.ecore#//UnaryOpExpression/unaryOp"/>
+    </genClasses>
+    <genClasses ecoreClass="cgimodel.ecore#//LiteralExpression">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cgimodel.ecore#//LiteralExpression/value"/>
+      <genOperations ecoreOperation="cgimodel.ecore#//LiteralExpression/getType"/>
+    </genClasses>
+    <genClasses ecoreClass="cgimodel.ecore#//SignalReferenceExpression">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference cgimodel.ecore#//SignalReferenceExpression/signal"/>
+    </genClasses>
+    <genClasses ecoreClass="cgimodel.ecore#//StateReferenceExpression">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference cgimodel.ecore#//StateReferenceExpression/parent"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference cgimodel.ecore#//StateReferenceExpression/state"/>
+    </genClasses>
+    <genClasses ecoreClass="cgimodel.ecore#//ConstReferenceExpression">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference cgimodel.ecore#//ConstReferenceExpression/const"/>
+    </genClasses>
+    <genClasses ecoreClass="cgimodel.ecore#//UIModel">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cgimodel.ecore#//UIModel/scenes"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cgimodel.ecore#//UIModel/transitions"/>
+    </genClasses>
+    <genClasses ecoreClass="cgimodel.ecore#//UIScene">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute cgimodel.ecore#//UIScene/active"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cgimodel.ecore#//UIScene/widgets"/>
+    </genClasses>
+    <genClasses ecoreClass="cgimodel.ecore#//Widget">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cgimodel.ecore#//Widget/props"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cgimodel.ecore#//Widget/events"/>
+    </genClasses>
+    <genClasses ecoreClass="cgimodel.ecore#//Property">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cgimodel.ecore#//Property/binding"/>
+    </genClasses>
+    <genClasses ecoreClass="cgimodel.ecore#//Event">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cgimodel.ecore#//Event/triggers"/>
+    </genClasses>
+    <genClasses ecoreClass="cgimodel.ecore#//SceneTransition">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference cgimodel.ecore#//SceneTransition/source"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference cgimodel.ecore#//SceneTransition/target"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference cgimodel.ecore#//SceneTransition/condition"/>
+      <genOperations ecoreOperation="cgimodel.ecore#//SceneTransition/perform"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

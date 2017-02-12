@@ -1,0 +1,13 @@
+ZestRootLayer:
+- highlightNode(): Ursprünglich wird der selektierte Knoten zum Schluss gezeichnet -> alle darauf liegenden
+  Knoten werden von dem selektierten Knoten überdeckt.
+  
+- unhighlightNode(): Wurde an highlightNode() angepasst
+
+AbstractStructuredGraphViewer: Um die Transition anzuzeigen
+- public GraphConnection getGraphModelConnection(Object obj)
+- public GraphNode getGraphModelNode(Object obj)
+- public void removeGraphModelConnection(Object obj)
+
+ZestRootLayer: Für die Transitionen
+public static final boolean EDGES_ON_TOP = true;

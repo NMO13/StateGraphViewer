@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StateModels>
+<Statemodel name="Key_pos">
+<State name="Ignition_off">
+<expr value="key_pos == 0"/>
+</State>
+<State name="Steering_free_ignition_off">
+<expr value="key_pos == 1"/>
+</State>
+<OrState name="OrState0">
+<State name="Ignitionaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
+<expr value="key_pos == 2"/>
+</State>
+<State name="Starting">
+<expr value="key_pos == 3"/>
+</State>
+</OrState>
+<OrState name="OrState1">
+	<OrState name="OrState11">
+		<State name="State111aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"/>
+		<OrState name="OrState1111">
+			<State name="State1111">
+				<expr value="expression1"/>
+			</State>
+			<State name="Use_Of_Ellipsis AAAAAAAAAA">
+				<expr value="expression2"/>
+			</State>
+		</OrState>	
+		<State name="State112"/>
+		<State name="State113"/>
+		<State name="State114"/>
+	</OrState>
+	<State name="State2"/>
+</OrState>
+<OrState name="OrState1111">
+	<State name="State1111">
+		<expr value="expression1"/>
+	</State>
+	<State name="Use_Of_Ellipsis AAAAAAAAAA">
+		<expr value="expression2"/>
+	</State>
+</OrState>
+</Statemodel>
+</StateModels>

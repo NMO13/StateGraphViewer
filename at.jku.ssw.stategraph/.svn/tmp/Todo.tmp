@@ -1,0 +1,40 @@
+<<<<<<< .mine
+11.9.2011
+- protected void alignGraph(InternalNode[] entitiesToLayout) hinzugefügt: Der Graph wird nun in der Mitte der View angezeigt.
+- Für die SelectionColor von den Connections einen IConnectionStyleProvider verwenden.
+  Bis jetzt wurde die SelectionColor im VerticalStateGraphLayout-Algorithmus hardgecodet.
+  -> siehe dazu TestElemConnectionStyleProvider()
+- Im Moment werden Knoten anhand ihres Namens gefunden. Z.B. StateModelNodeImpl.findNode() sucht anhand des Namens
+  Besser wäre es jedem Knoten eine eindeutige ID zu geben, da der Name nicht eindeutig ist
+
+=======
+10.9.2011
+- Graph in die Mitte der View platzieren
+>>>>>>> .r77
+1.3.2011
+- kein Gradient: erledigt
+- dunklerer Rand: erledigt
+- Breite der Blätter auf Textbreite: 
+- Höhe der Blätter etwas höher: erledigt
+- Blätter weiß: erledigt
+- Transitionen zeichnen
+
+13.4.2011
+- können OR-States auch Transitionen besitzen?
+
+14.4.2011
+- jeden Knoten einen eindeutige ID (Integer) geben -> Statesuche basiert dann auf
+  dieser ID und nicht mehr auf dem Namen; -> equals() von State entsprechend überschreiben
+  
+10.5.2011
+- Den Knotenraum optimaler ausfüllen, damit sie so breit wie möglich sind
+- Transitionsbezeichnungen als Tooltip anzeigen; Format: "[Condition]"
+- Selektierung der Knoten soll möglich sein und ein Interface machen, damit sich Listener 
+  dran hängen können
+- Testen
+  
+9.7
+
+- delete wrong node presentation at the beginning
+- StateModelNodeImpl: why many sources with many targets? Shouldn't it be one source with many targets?
+  

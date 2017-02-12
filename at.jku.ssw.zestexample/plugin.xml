@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            class="at.jku.ssw.zestexample.view.ZestViewOne"
+            id="at.jku.ssw.zestexample.view1"
+            name="Zest Example Family Tree View"
+            restorable="true">
+      </view>
+      <view
+            class="at.jku.ssw.zestexample.view.ZestViewTwo"
+            id="at.jku.ssw.zestexample.view2"
+            name="Zest Example Horizontal Text View"
+            restorable="true">
+      </view>
+      <view
+            class="at.jku.ssw.zestexample.view.ZestViewThree"
+            id="at.jku.ssw.zestexample.view3"
+            name="Zest Example Huge Model View"
+            restorable="true">
+      </view>
+      <view
+      		class="at.jku.ssw.zestexample.view.ExampleView"
+      		id="at.jku.ssw.zestexample.exampleview"
+            name="Example View"
+            restorable="true">
+      </view>
+      <view
+            class="at.jku.ssw.zestexample.view.StateModelView"
+            id="at.jku.ssw.zestexample.view4"
+            name="StateModel View"
+            restorable="true">
+      </view>
+   </extension>
+
+</plugin>

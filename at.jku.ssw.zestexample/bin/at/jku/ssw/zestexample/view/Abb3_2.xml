@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StateModels>
+<Statemodel name="TestStateModel">
+<State name="State0">
+<expr value="key_pos == 0"/>
+</State>
+<State name="State01">
+<expr value="key_pos == 1"/>
+</State>
+<OrState name="OrState0">
+<State name="State001">
+<expr value="key_pos == 2"/>
+</State>
+<State name="State1">
+<expr value="key_pos == 3"/>
+</State>
+</OrState>
+<OrState name="OrState1">
+	<OrState name="OrState11">
+		<State name="State111"/>
+		<OrState name="OrState1111">
+			<State name="State1111">
+				<expr value="expression1"/>
+			</State>
+			<State name="State1112">
+				<expr value="expression2"/>
+			</State>
+		</OrState>	
+		<State name="State112"/>
+		<State name="State113"/>
+		<State name="State114"/>
+	</OrState>
+	<State name="State2"/>
+</OrState>
+
+	<State name="State1456">
+		<expr value="expression1"/>
+	</State>
+
+<Transition>
+<source>
+<State name="State1"/>
+</source>
+<target>
+<State name="State12345"/>
+</target>
+</Transition>
+<Transition>
+<source>
+<State name="State1"/>
+</source>
+<target>
+<State name="State113"/>
+</target>
+</Transition>
+<Transition>
+<source>
+<State name="OrState11111"/>
+</source>
+<target>
+<State name="State113"/>
+</target>
+</Transition>
+<Transition>
+<source>
+<State name="State114"/>
+</source>
+<target>
+<State name="State113"/>
+</target>
+</Transition>
+<Transition>
+<source>
+<State name="State114"/>
+</source>
+<target>
+<State name="State112"/>
+</target>
+</Transition>
+<Transition>
+<source>
+<State name="State01"/>
+</source>
+<target>
+<State name="State112"/>
+</target>
+</Transition>
+<Transition>
+<source>
+<State name="State2"/>
+</source>
+<target>
+<State name="State0"/>
+</target>
+</Transition>
+<Transition>
+<source>
+<State name="State1456"/>
+</source>
+<target>
+<State name="State1"/>
+</target>
+</Transition>
+</Statemodel>
+</StateModels>

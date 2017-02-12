@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<StateModels>
+<Statemodel name="Key_pos">
+<State name="Ignition_off">
+<expr value="key_pos == 0"/>
+</State>
+<State name="Steering_free_ignition_off">
+<expr value="key_pos == 1"/>
+</State>
+<State name="Ignition">
+<expr value="key_pos == 2"/>
+</State>
+<State name="Starting">
+<expr value="key_pos == 3"/>
+</State>
+</Statemodel>
+<Statemodel name="Direction">
+<OrState name="Forward">
+<State name="Gear1">
+<expr value="Ignition &amp;&amp; gear == 1"/>
+</State>
+<State name="Gear2">
+<expr value="Ignition &amp;&amp; gear == 2"/>
+</State>
+<State name="Gear3">
+<expr value="Ignition &amp;&amp; gear == 3"/>
+</State>
+<State name="Gear4">
+<expr value="Ignition &amp;&amp; gear == 4"/>
+</State>
+<State name="Gear5">
+<expr value="Ignition &amp;&amp; gear == 5"/>
+</State>
+<State name="Gear6">
+<expr value="Ignition &amp;&amp; gear == 6"/>
+</State>
+</OrState>
+<State name="Idle">
+<expr value="Ignition &amp;&amp; gear == 0"/>
+</State>
+<State name="Backward">
+<expr value="Ignition &amp;&amp; gear == -1"/>
+</State>
+</Statemodel>
+<Statemodel name="Coolant_temp">
+<State name="Cold"/>
+<State name="Warm"/>
+<State name="Hot"/>
+<State name="Critical"/>
+<Transition>
+<source>
+<State name="Critical"/>
+</source>
+<target>
+<State name="Cold"/>
+</target>
+</Transition>
+<Transition>
+<source>
+<State name="Hot"/>
+</source>
+<target>
+<State name="Cold"/>
+</target>
+</Transition>
+<Transition>
+<source>
+<State name="Cold"/>
+</source>
+<target>
+<State name="Warm"/>
+</target>
+<condition value="coolant_temp &gt;= 62.5 &amp;&amp; coolant_temp &lt; 87.5"/>
+</Transition>
+<Transition>
+<source>
+<State name="Warm"/>
+</source>
+<target>
+<State name="Cold"/>
+</target>
+<condition value="coolant_temp &lt; 57.5"/>
+</Transition>
+<Transition>
+<source>
+<State name="Warm"/>
+</source>
+<target>
+<State name="Hot"/>
+</target>
+<condition value="coolant_temp &gt;= 87.5 &amp;&amp; coolant_temp &lt; 97.5"/>
+</Transition>
+<Transition>
+<source>
+<State name="Hot"/>
+</source>
+<target>
+<State name="Warm"/>
+</target>
+<condition value="coolant_temp &gt;= 57.5 &amp;&amp; coolant_temp &lt; 82.5"/>
+</Transition>
+<Transition>
+<source>
+<State name="Hot"/>
+</source>
+<target>
+<State name="Critical"/>
+</target>
+<condition value="coolant_temp &gt;= 97.5"/>
+</Transition>
+<!--Transition>
+<source>
+<State name="Critical"/>
+</source>
+<target>
+<State name="Hot"/>
+</target>
+<condition value="coolant_temp &gt;= 82.5 &amp;&amp; coolant_temp &lt; 92.5"/>
+</Transition-->
+</Statemodel>
+<Statemodel name="Wiper">
+<State name="Off">
+<expr value="wiper == 0"/>
+</State>
+<State name="Automatic">
+<expr value="wiper == 1"/>
+</State>
+<State name="Slow">
+<expr value="wiper == 2"/>
+</State>
+<State name="Fast">
+<expr value="wiper == 3"/>
+</State>
+</Statemodel>
+<Statemodel name="Vent_direction">
+<State name="Front_window">
+<expr value="vent_direction == 0"/>
+</State>
+<State name="Interior">
+<expr value="vent_direction == 1"/>
+</State>
+<State name="Leg_area">
+<expr value="vent_direction == 2"/>
+</State>
+</Statemodel>
+<Statemodel name="Fuel_level">
+<State name="Normal"/>
+<State name="Reserve"/>
+<State name="Empty"/>
+<Transition>
+<source>
+<State name="Normal"/>
+</source>
+<target>
+<State name="Reserve"/>
+</target>
+<condition value="fuel_level &lt; 9.0 &amp;&amp; fuel_level &gt; 1.0"/>
+</Transition>
+<Transition>
+<source>
+<State name="Reserve"/>
+</source>
+<target>
+<State name="Normal"/>
+</target>
+<condition value="fuel_level &gt; 11.0"/>
+</Transition>
+<Transition>
+<source>
+<State name="Reserve"/>
+</source>
+<target>
+<State name="Empty"/>
+</target>
+<condition value="fuel_level &lt;= 1.0"/>
+</Transition>
+<Transition>
+<source>
+<State name="Empty"/>
+</source>
+<target>
+<State name="Reserve"/>
+</target>
+<condition value="fuel_level &lt;= 11.0 &amp;&amp; fuel_level &gt; 2.0"/>
+</Transition>
+</Statemodel>
+<Statemodel name="Test_StateRefs">
+<State name="State1">
+<expr value="Normal &amp;&amp; speed &lt; 100"/>
+</State>
+<State name="State2">
+<expr value="Reserve &amp;&amp; speed &lt; 200"/>
+</State>
+</Statemodel>
+<Statemodel name="Seat_belts">
+<State name="Closed">
+<expr value="drv_seat_belt_cls &amp;&amp; (!codrv_seat_taken || codrv_seat_taken &amp;&amp; codrv_seatbelt_cls)"/>
+</State>
+<State name="Open">
+<expr value="!drv_seat_belt_cls || codrv_seat_taken &amp;&amp; !codrv_seatbelt_cls"/>
+</State>
+</Statemodel>
+<Statemodel name="Absperrung">
+<State name="Zugesperrt">
+<expr value="((door_lock_fr_le &amp;&amp; door_lock_fr_ri) &amp;&amp; (door_lock_re_le &amp;&amp; door_lock_re_ri)) &amp;&amp; trunk_lock"/>
+</State>
+<State name="Unsicher">
+<expr value="((!door_lock_fr_le || !door_lock_fr_ri) || (!door_lock_re_le || !door_lock_re_ri)) || !trunk_lock"/>
+</State>
+<State name="Alle_Schloesser_offen">
+<expr value="((!door_lock_fr_le &amp;&amp; !door_lock_fr_ri) &amp;&amp; (!door_lock_re_le &amp;&amp; !door_lock_re_ri)) &amp;&amp; !trunk_lock"/>
+</State>
+</Statemodel>
+<Statemodel name="Outside_temp">
+<State name="Normal_temp"/>
+<State name="Winter_temp"/>
+<Transition>
+<source>
+<State name="Normal_temp"/>
+</source>
+<target>
+<State name="Winter_temp"/>
+</target>
+<condition value="outside_temp &lt; 1.5"/>
+</Transition>
+<Transition>
+<source>
+<State name="Winter_temp"/>
+</source>
+<target>
+<State name="Normal_temp"/>
+</target>
+<condition value="outside_temp &gt; 2.5"/>
+</Transition>
+</Statemodel>
+</StateModels>

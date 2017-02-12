@@ -1,0 +1,273 @@
+package at.jku.ssw.zesttree.widgets;
+
+import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.draw2d.Clickable;
+import org.eclipse.draw2d.FigureUtilities;
+import org.eclipse.draw2d.FreeformLayout;
+import org.eclipse.draw2d.ImageFigure;
+import org.eclipse.draw2d.MouseEvent;
+import org.eclipse.draw2d.MouseListener;
+import org.eclipse.draw2d.PositionConstants;
+import org.eclipse.draw2d.geometry.Dimension;
+import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.zest.core.widgets.GraphNode;
+import org.eclipse.zest.core.widgets.internal.GraphLabel;
+
+import at.jku.ssw.zesttree.activator.ZestTreePlugin;
+import at.jku.ssw.zesttree.listeners.TogglerClickedEvent;
+import at.jku.ssw.zesttree.listeners.TogglerClickedListener;
+
+/**
+ * This class adds a plus/minus expander to the standard GraphLabel
+ * 
+ * @author Kölbleitner Florian
+ */
+public class ClickableGraphLabel extends GraphLabel {
+
+	private static final int MAX_TEXTLEN = 20;
+	private static Image plus;
+	private static Image minus;
+
+	private Expander expander = null;
+	private ClickableGraphNode holder;
+
+	private String originalText;
+	private int textLength;
+
+	private ListenerList listeners;
+	private boolean horizontal;
+
+	static {
+
+		if(ZestTreePlugin.getDefault() != null) {
+
+			plus = ZestTreePlugin.getImageDescriptor("icons/plus.png")
+					.createImage();
+			minus = ZestTreePlugin.getImageDescriptor("icons/minus.png")
+					.createImage();
+		} else {
+			plus = ImageDescriptor.createFromURL(
+					ClickableGraphLabel.class.getResource("/icons/plus.png"))
+					.createImage();
+			minus = ImageDescriptor.createFromURL(
+					ClickableGraphLabel.class.getResource("/icons/minus.png"))
+					.createImage();
+		}
+	}
+
+	public ClickableGraphLabel(boolean cacheLabel, GraphNode holder) {
+
+		this("", cacheLabel, holder);
+	}
+
+	public ClickableGraphLabel(String text, boolean cacheLabel, GraphNode holder) {
+
+		this("", null, cacheLabel, holder);
+	}
+
+	public ClickableGraphLabel(Image i, boolean cacheLabel, GraphNode holder) {
+
+		this("", i, cacheLabel, holder);
+	}
+
+	public ClickableGraphLabel(String text, Image i, boolean cacheLabel,
+			GraphNode holder) {
+
+		this(text, i, cacheLabel, holder, false);
+	}
+
+	public ClickableGraphLabel(String text, Image i, boolean cacheLabel,
+			GraphNode holder, boolean horizontal) {
+
+		super(text, i, cacheLabel);
+
+		listeners = new ListenerList();
+
+		originalText = text.length() > MAX_TEXTLEN ? text.substring(0,
+				MAX_TEXTLEN) : text;
+		setTextAlignment(PositionConstants.LEFT);
+		this.horizontal = horizontal;
+
+		this.holder = (ClickableGraphNode) holder;
+		setLayoutManager(new FreeformLayout());
+		this.expander = new Expander();
+		this.add(expander);
+	}
+
+	public void setText(String text) {
+
+		originalText = text.length() > MAX_TEXTLEN ? text.substring(0,
+				MAX_TEXTLEN - 2)
+				+ "..." : text;
+		super.setText(originalText);
+		textLength = getText().length();
+		if(expander != null) {
+			updateExpander();
+		}
+	}
+
+	public void setTextLength(int len) {
+
+		if(len != textLength) {
+			textLength = len;
+			if(len < originalText.length()) {
+				super.setText(originalText.substring(0, textLength));
+			} else {
+				super.setText(originalText);
+			}
+		}
+	}
+
+	public void updateExpander() {
+
+		if(holder.getSourceConnections().isEmpty()) {
+			this.getChildren().remove(expander);
+		} else {
+			if(!this.getChildren().contains(expander)) {
+				add(expander);
+			}
+			Point loc;
+			Dimension exSize = expander.getSize();
+			if(horizontal) {
+				loc = getBounds().getRight();
+				loc.translate(-exSize.width, -exSize.height / 2);
+			} else {
+				loc = getBounds().getBottom();
+				loc.translate(-exSize.width / 2, -exSize.height);
+			}
+//			System.out
+//					.println((loc.x - ClickableGraphLabel.this.getLocation().x)
+//							+ " " + getText());
+			expander.setLocation(loc);
+		}
+	}
+
+	void setExpandedState(boolean state) {
+
+		expander.setExpandedState(state);
+	}
+
+	protected void adjustBoundsToFit() {
+
+		String text = getText();
+		if((text != null)) {
+			Font font = getFont();
+			if(font != null) {
+				Dimension minSize = FigureUtilities.getTextExtents(text, font);
+				int textHeight = minSize.height;
+
+				if(getIcon() != null) {
+					org.eclipse.swt.graphics.Rectangle imageRect = getIcon()
+							.getBounds();
+					int expandHeight = Math.max(imageRect.height
+							- minSize.height, 0);
+					int expandWidth = Math.max(imageRect.width - minSize.width,
+							0);
+
+					if(getTextPlacement() == PositionConstants.SOUTH
+							|| getTextPlacement() == PositionConstants.NORTH) {
+						minSize.expand(expandWidth, expandHeight);
+					} else {
+						minSize.expand(imageRect.width + 4, expandHeight);
+					}
+				}
+
+				if(getTextPlacement() == PositionConstants.SOUTH
+						|| getTextPlacement() == PositionConstants.NORTH) {
+					setIconTextGap(0);
+					minSize.expand(0, textHeight);
+					minSize.expand(6 + (2 * getBorderWidth()),
+							4 + (2 * getBorderWidth()));
+				} else {
+					minSize.expand(10 + (2 * getBorderWidth()),
+							4 + (2 * getBorderWidth()));
+				}
+				if(horizontal) {
+					minSize.expand(9, 4);
+				} else {
+					minSize.expand(0, 4);
+				}
+
+				setBounds(new Rectangle(getLocation(), minSize));
+			}
+		}
+	}
+
+	public void addTogglerClickedListener(TogglerClickedListener l) {
+
+		listeners.add(l);
+	}
+
+	private void fireTogglerClicked() {
+
+		for(Object o : listeners.getListeners()) {
+			TogglerClickedListener l = (TogglerClickedListener) o;
+			l.togglerClicked(new TogglerClickedEvent(this, holder));
+		}
+	}
+
+	private class Expander extends Clickable {
+
+		private boolean open;
+		private ImageFigure img;
+
+		public Expander() {
+
+			open = true;
+			setStyle(Clickable.STYLE_TOGGLE);
+
+			img = new ImageFigure();
+			img.setSize(9, 9);
+			img.setImage(minus);
+
+			this.setLocation(new Point(0, 0));
+			this.setLayoutManager(new FreeformLayout());
+			this.add(img);
+			this.setSize(9, 9);
+			Point p = ClickableGraphLabel.this.getBounds().getBottom();
+			this.setLocation(new Point(p.x, p.y));
+			img.addMouseListener(new MouseListener() {
+
+				@Override
+				public void mouseDoubleClicked(MouseEvent me) {
+
+				}
+
+				@Override
+				public void mousePressed(MouseEvent me) {
+
+					fireTogglerClicked();
+				}
+
+				@Override
+				public void mouseReleased(MouseEvent me) {
+
+				}
+			});
+		}
+
+		void setExpandedState(boolean state) {
+
+			open = state;
+			if(open) {
+				expand();
+			} else {
+				collapse();
+			}
+		}
+
+		private void collapse() {
+
+			img.setImage(plus);
+		}
+
+		private void expand() {
+
+			img.setImage(minus);
+		}
+	}
+}

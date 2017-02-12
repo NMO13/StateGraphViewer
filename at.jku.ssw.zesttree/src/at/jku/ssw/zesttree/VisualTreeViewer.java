@@ -1,0 +1,885 @@
+package at.jku.ssw.zesttree;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import org.eclipse.draw2d.Animation;
+import org.eclipse.draw2d.ColorConstants;
+import org.eclipse.draw2d.MouseEvent;
+import org.eclipse.draw2d.MouseListener;
+import org.eclipse.draw2d.MouseMotionListener;
+import org.eclipse.draw2d.RangeModel;
+import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.jface.viewers.ContentViewer;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IBaseLabelProvider;
+import org.eclipse.jface.viewers.IContentProvider;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Scale;
+import org.eclipse.zest.core.viewers.GraphViewer;
+import org.eclipse.zest.core.widgets.GraphConnection;
+import org.eclipse.zest.core.widgets.GraphItem;
+import org.eclipse.zest.core.widgets.GraphNode;
+import org.eclipse.zest.layouts.LayoutStyles;
+
+import at.jku.ssw.zesttree.layout.LayeredHorizontalTreeLayoutAlgorithm;
+import at.jku.ssw.zesttree.layout.LayeredTreeLayoutAlgorithm;
+import at.jku.ssw.zesttree.listeners.TogglerClickedAdapter;
+import at.jku.ssw.zesttree.listeners.TogglerClickedEvent;
+import at.jku.ssw.zesttree.listeners.TogglerClickedListener;
+import at.jku.ssw.zesttree.providers.SimpleTree2GraphProvider;
+import at.jku.ssw.zesttree.providers.Tree2GraphProvider;
+import at.jku.ssw.zesttree.scrolling.AbstractScrollStrategy;
+import at.jku.ssw.zesttree.scrolling.DefaultScrollStrategy;
+import at.jku.ssw.zesttree.scrolling.IScrollStrategy;
+import at.jku.ssw.zesttree.scrolling.IScrollStrategy.ScrollAction;
+import at.jku.ssw.zesttree.widgets.AdaptedGraph;
+import at.jku.ssw.zesttree.widgets.ClickableGraphNode;
+import at.jku.ssw.zesttree.widgets.LayeredTreeViewerBase;
+
+/**
+ * LayeredTreeViewer serves as a connection between the user and the graph
+ * viewer/ layout algorithm providing node collapsing/expanding functionality,
+ * key navigation and key/mouse interactivity.<br>
+ * <br>
+ * ATTENTION:<br>
+ * LayeredTreeviewer accepts only {@link SimpleTree2GraphProvider} or
+ * {@link Tree2GraphProvider} as Content Provider
+ * 
+ * @version 1.0
+ * 
+ * @author Kölbleitner Florian
+ */
+public class VisualTreeViewer extends ContentViewer {
+
+	public enum KeyId {
+
+		KEY_UP,
+		KEY_DOWN,
+		KEY_LEFT,
+		KEY_RIGHT
+	}
+
+	private static final int ANIMATION_TIME = 200;
+	private static final int SIDE_GAP = 10;
+	private int expanded_level;
+
+	private LayeredTreeViewerBase viewer;
+	private TreeNavigation nav;
+	private IScrollStrategy scroller;
+	private Scale scale;
+
+	private List<GraphNode> collapsedNodes;
+	private List<NodeInfo> sortedNodes;
+	private GraphNode cur;
+
+	private boolean horizontalStyle;
+	private boolean shiftKeyPressed;
+
+	// LEAFING ========================
+	private GraphNode root;
+	private List<GraphConnection> mCh;
+
+	private boolean leafingStyle;
+
+	/**
+	 * Simple Constructor for vertical layout and no defaultCollapsed level
+	 * 
+	 * @param parent Parent control
+	 */
+	public VisualTreeViewer(Composite parent) {
+
+		this(parent, false);
+
+		//workbenchPart.getSite().setSelectionProvider(this.graphicalViewer),
+	}
+
+	/**
+	 * Constructor for vertical or horizontal layout and no defaultCollapsed
+	 * level
+	 * 
+	 * @param parent Parent control
+	 * @param horizontalStyle <code>true</code> for horizontal tree layout
+	 */
+	public VisualTreeViewer(Composite parent, boolean horizontalStyle) {
+
+		this(parent, horizontalStyle, -1);
+	}
+
+	/**
+	 * Constructor for vertical layout and a defaultCollapsed level
+	 * 
+	 * @param parent Parent control
+	 * @param expandedLevel The maximum level of expanded nodes
+	 */
+	public VisualTreeViewer(Composite parent, int expandedLevel) {
+
+		this(parent, false, expandedLevel);
+	}
+
+	/**
+	 * Constructor for vertical or horizontal layout and a defaultCollapsed
+	 * level
+	 * 
+	 * @param parent Parent control
+	 * @param horizontalStyle <code>true</code> for horizontal tree layout
+	 * @param expandedLevel The maximum level of expanded nodes
+	 */
+	public VisualTreeViewer(Composite parent, boolean horizontalStyle,
+			int expandedLevel) {
+
+		viewer = null;
+		collapsedNodes = new ArrayList<GraphNode>();
+		leafingStyle = false;
+		expanded_level = expandedLevel;
+
+		init(parent, horizontalStyle);
+
+		parent.setBackground(ColorConstants.white);
+	}
+
+	private void init(Composite parent, boolean horizontalStyle) {
+
+//		parent.addControlListener(new ControlAdapter() {
+//
+//			@Override
+//			public void controlResized(ControlEvent e) {
+//
+//				System.out.println(((Composite) e.widget).getSize());
+//				org.eclipse.swt.graphics.Point parentSize = ((Composite) e.widget)
+//						.getSize();
+//				if(viewer != null && scale != null) {
+//					viewer.getGraphControl().setLayoutData(
+//							new RowData(parentSize.x, parentSize.y
+//									- scale.getSize().y));
+//				}
+//			}
+//		});
+
+//		RowLayout rL = new RowLayout();
+
+//		parent.setLayout(rL);
+
+//		scale = new Scale(parent, SWT.HORIZONTAL);
+//		scale.setMaximum(100);
+//		scale.setIncrement(5);
+
+		this.horizontalStyle = horizontalStyle;
+		viewer = new LayeredTreeViewerBase(parent, SWT.NONE, horizontalStyle);
+//		System.out.println(parent.getSize().x + " " + parent.getSize().y);
+//		viewer.getGraphControl().setLayoutData(
+//				new RowData(parent.getSize().x, parent.getSize().y));
+
+		if(horizontalStyle) {
+			viewer.setLayoutAlgorithm(new LayeredHorizontalTreeLayoutAlgorithm(
+					LayoutStyles.NO_LAYOUT_NODE_RESIZING, leafingStyle));
+		} else {
+			viewer.setLayoutAlgorithm(new LayeredTreeLayoutAlgorithm(
+					LayoutStyles.NO_LAYOUT_NODE_RESIZING, leafingStyle));
+		}
+
+		nav = new TreeNavigation();
+		scroller = new DefaultScrollStrategy(viewer.getGraphControl());
+
+		viewer.addDoubleClickListener(doubleClickListener);
+		viewer.getGraphControl().setFocus();
+		viewer.getGraphControl().addKeyListener(arrowListener);
+		viewer.getGraphControl().addKeyListener(shiftDetector);
+
+		// viewer.getGraphControl().getLightweightSystem().getRootFigure().
+		// addMouseListener(leafingDetector);
+
+		DragListener d = new DragListener();
+		viewer.getGraphControl().getLightweightSystem().getRootFigure()
+				.addMouseMotionListener(d);
+		viewer.getGraphControl().getLightweightSystem().getRootFigure()
+				.addMouseListener(d);
+//		viewer.getGraphControl().getLightweightSystem().setEventDispatcher(
+//				dispatcher);
+	}
+
+	/**
+	 * returns the intern GraphViewer Component holding the Graph
+	 * 
+	 * @return The intern GraphViewer
+	 */
+	public GraphViewer getInternViewer() {
+
+		return viewer;
+	}
+
+// ==== VIEWER METHODS =========================================================	
+
+	public void setInput(Object input) {
+
+		viewer.setInput(input);
+
+		for(Object o : viewer.getGraphControl().getNodes()) {
+			if(o instanceof ClickableGraphNode) {
+				ClickableGraphNode node = (ClickableGraphNode) o;
+				node.addTogglerClickedListener(toggleHandler);
+			}
+		}
+
+		root = (GraphNode) viewer.findGraphItem(input);
+		mCh = root.getSourceConnections();
+
+		if(expanded_level > 0) {
+			collapseChildrenOfLevel(expanded_level);
+		} else {
+			collapseChildrenOfLevel(1);
+		}
+
+		buildSortedNodes();
+		((AdaptedGraph) viewer.getGraphControl()).setDefaultNodeSize();
+	}
+
+	public void setContentProvider(IContentProvider contentProvider) {
+
+		if(contentProvider instanceof SimpleTree2GraphProvider) {
+			viewer.setContentProvider(contentProvider);
+		} else {
+			throw new IllegalArgumentException(
+					"Invalid content provider, only SimpleTree2GraphProvider "
+							+ "or Tree2GraphProvider are supported.");
+		}
+	}
+
+	public void setLabelProvider(IBaseLabelProvider labelProvider) {
+
+		viewer.setLabelProvider(labelProvider);
+	}
+
+	@Override
+	public Control getControl() {
+
+		return viewer.getControl();
+	}
+
+	@Override
+	public ISelection getSelection() {
+
+		return viewer.getSelection();
+	}
+
+	@Override
+	public void refresh() {
+
+		viewer.refresh();
+	}
+
+	@Override
+	public void setSelection(ISelection selection, boolean reveal) {
+
+		viewer.setSelection(selection, reveal);
+	}
+
+// ==== SCROLL STRATEGY ========================================================
+
+	/**
+	 * Sets the viewers Scroll strategy
+	 * 
+	 * @see IScrollStrategy
+	 * @see AbstractScrollStrategy
+	 * @see DefaultScrollStrategy
+	 * @param strategy The Scroll Strategy
+	 */
+	public void setScrollStragegy(IScrollStrategy strategy) {
+
+		this.scroller = strategy;
+	}
+
+	/**
+	 * Returns the viewers Scroll Strategy
+	 * 
+	 * @see IScrollStrategy
+	 * @see AbstractScrollStrategy
+	 * @see DefaultScrollStrategy
+	 * @return The Scroll Strategy
+	 */
+	public IScrollStrategy getScrollStrategy() {
+
+		return scroller;
+	}
+
+// ==== EXPANDING / COLLAPSING =================================================
+
+	private int count = 0;
+
+	private void buildSortedNodes() {
+
+		sortedNodes = new ArrayList<NodeInfo>();
+		buildSortedNodesRecursive(root, 0);
+		Collections.sort(sortedNodes, new Comparator<NodeInfo>() {
+
+			@Override
+			public int compare(NodeInfo a, NodeInfo b) {
+
+				if(a.level == b.level) {
+					return b.count - a.count;
+				} else {
+					return b.level - a.level;
+				}
+			}
+		});
+//		System.out.println(sortedNodes);
+	}
+
+	private void buildSortedNodesRecursive(GraphNode node, int depth) {
+
+		sortedNodes.add(new NodeInfo(node, depth, count++));
+		List<GraphConnection> sConn = node.getSourceConnections();
+		for(GraphConnection c : sConn) {
+			buildSortedNodesRecursive(c.getDestination(), depth + 1);
+		}
+	}
+
+	private void toggleAction(GraphItem item) {
+
+		if(item instanceof GraphNode) {
+			GraphNode node = (GraphNode) item;
+			List<GraphConnection> ch = node.getSourceConnections();
+
+			if(!ch.isEmpty()) {
+				toggleVisibility(node, ch.get(0).getDestination().isVisible(),
+						true, true);
+			}
+		}
+	}
+
+	private void toggleVisibility(GraphNode node, boolean collapse,
+			boolean animate, boolean apply) {
+
+		List<GraphNode> allChildren = collectAllChildren(node);
+		if(collapse) {
+			//collapsing action ================================================
+			if(node instanceof ClickableGraphNode) {
+				((ClickableGraphNode) node).setExpandedState(false);
+			}
+			if(!collapsedNodes.contains(node)) {
+				collapsedNodes.add(node);
+			}
+			if(animate) {
+				Animation.markBegin();
+				for(GraphNode n : allChildren) {
+					n.setLocation(node.getLocation().x, node.getLocation().y);
+				}
+				Animation.run(ANIMATION_TIME);
+				for(GraphNode n : allChildren) {
+					n.setVisible(false);
+				}
+			} else {
+				for(GraphNode n : allChildren) {
+					n.setLocation(node.getLocation().x, node.getLocation().y);
+					n.setVisible(false);
+				}
+			}
+		} else {
+			//expanding action =================================================
+			if(node instanceof ClickableGraphNode) {
+				((ClickableGraphNode) node).setExpandedState(true);
+			}
+			collapsedNodes.remove(node);
+			for(GraphNode n : allChildren) {
+				n.setLocation(node.getLocation().x, node.getLocation().y);
+			}
+			for(GraphNode n : allChildren) {
+				n.setVisible(true);
+			}
+		}
+		if(apply) {
+			if(!collapse) {
+				scroller.performScroll(node, ScrollAction.EXPANSION);
+			}
+			viewer.applyLayout();
+		}
+	}
+
+	private List<GraphNode> collectAllChildren(GraphNode parent) {
+
+		List<GraphNode> list = new ArrayList<GraphNode>();
+		for(Object obj : parent.getSourceConnections()) {
+			GraphNode n = ((GraphConnection) obj).getDestination();
+			list.add(n);
+			if(!collapsedNodes.contains(n)) {
+				list.addAll(collectAllChildren(n));
+			}
+		}
+		return list;
+	}
+
+	private void collapseChildrenOfLevel(int level) {
+
+		int curLevel = 1;
+
+		List<GraphNode> parents = new ArrayList<GraphNode>();
+		List<GraphNode> children = new ArrayList<GraphNode>();
+		parents.add(root);
+		while(curLevel < level && parents.size() > 0) {
+			for(GraphNode g : parents) {
+				for(Object o : g.getSourceConnections()) {
+					children.add(((GraphConnection) o).getDestination());
+				}
+			}
+			parents = new ArrayList<GraphNode>(children);
+			children.clear();
+			curLevel++;
+		}
+		for(GraphNode g : new ArrayList<GraphNode>(parents)) {
+			parents.addAll(collectAllChildren(g));
+		}
+
+		for(GraphNode g : parents) {
+			toggleVisibility(g, true, false, false);
+		}
+		viewer.applyLayout();
+	}
+
+	private void toggleActionRecursive(GraphNode parent) {
+
+		if(!collapsedNodes.contains(parent)) {
+			Point loc = parent.getLocation();
+			Animation.markBegin();
+			for(GraphNode n : collectAllChildren(parent)) {
+				n.setLocation(loc.x, loc.y);
+			}
+			Animation.run(ANIMATION_TIME);
+		}
+		toggleRecursively(parent, !collapsedNodes.contains(parent));
+		viewer.applyLayout();
+	}
+
+	private void toggleRecursively(GraphNode parent, boolean collapse) {
+
+		if(parent.getSourceConnections().size() > 0) {
+
+			List<GraphNode> children = collectAllChildren(parent);
+			for(GraphNode n : children) {
+				toggleRecursively(n, collapse);
+			}
+			toggleVisibility(parent, collapse, false, false);
+		}
+	}
+
+// ==== LISTENERS ==============================================================
+
+	private TogglerClickedListener toggleHandler = new TogglerClickedAdapter() {
+
+		public void togglerClicked(TogglerClickedEvent e) {
+
+			if(shiftKeyPressed) {
+				toggleActionRecursive(e.getNode());
+			} else {
+				toggleAction(e.getNode());
+			}
+		}
+	};
+
+	private IDoubleClickListener doubleClickListener = new IDoubleClickListener() {
+
+		@Override
+		public void doubleClick(DoubleClickEvent event) {
+
+			StructuredSelection selected = (StructuredSelection) event
+					.getSelection();
+			if(!selected.isEmpty()) {
+				GraphItem item = viewer.findGraphItem(selected
+						.getFirstElement());
+				if(shiftKeyPressed && item instanceof GraphNode) {
+					toggleActionRecursive((GraphNode) item);
+				} else {
+					toggleAction(item);
+				}
+			}
+		}
+	};
+
+	private KeyListener arrowListener = new KeyAdapter() {
+
+		private final int UP = 16777217;
+		private final int DOWN = 16777218;
+		private final int LEFT = 16777219;
+		private final int RIGHT = 16777220;
+		private final int SPACE = 32;
+
+		@Override
+		public void keyPressed(KeyEvent e) {
+
+			switch(e.keyCode) {
+			case UP:
+				if(horizontalStyle) {
+					nav.processKey(KeyId.KEY_LEFT);
+				} else {
+					nav.processKey(KeyId.KEY_UP);
+				}
+				break;
+			case DOWN:
+				if(horizontalStyle) {
+					nav.processKey(KeyId.KEY_RIGHT);
+				} else {
+					nav.processKey(KeyId.KEY_DOWN);
+				}
+				break;
+			case LEFT:
+				if(shiftKeyPressed) {
+					((LayeredTreeLayoutAlgorithm) viewer.getGraphControl()
+							.getLayoutAlgorithm()).up();
+					viewer.applyLayout();
+				} else {
+					if(horizontalStyle) {
+						nav.processKey(KeyId.KEY_UP);
+					} else {
+						nav.processKey(KeyId.KEY_LEFT);
+					}
+				}
+				break;
+			case RIGHT:
+				if(shiftKeyPressed) {
+					((LayeredTreeLayoutAlgorithm) viewer.getGraphControl()
+							.getLayoutAlgorithm()).down();
+					viewer.applyLayout();
+				} else {
+					if(horizontalStyle) {
+						nav.processKey(KeyId.KEY_DOWN);
+					} else {
+						nav.processKey(KeyId.KEY_RIGHT);
+					}
+				}
+				break;
+			case SPACE:
+				if(cur != null) {
+					if(shiftKeyPressed) {
+						toggleActionRecursive(cur);
+					} else {
+						toggleAction(cur);
+					}
+				}
+				break;
+			// TODO Incomplete Modes - Leafing and h/v switching
+//			case 109:
+//				// button 'M' for Mode change
+//				leafingStyle = !leafingStyle;
+//				viewer.setLayoutAlgorithm(new LayeredTreeLayoutAlgorithm(
+//						LayoutStyles.NO_LAYOUT_NODE_RESIZING, leafingStyle),
+//						true);
+//				cur = mCh.isEmpty() || cur == null ? root : mCh.get(0)
+//						.getDestination();
+//				scroller.performScroll(cur, ScrollAction.MODE_CHANGE);
+//				break;
+//			case 97:
+//				// button 'A' for next leafing node
+//				((LayeredTreeLayoutAlgorithm) viewer.getGraphControl()
+//						.getLayoutAlgorithm()).up();
+//
+//				viewer.applyLayout();
+//				break;
+//			case 100:
+//				// button 'D' for next leafing node
+//				((LayeredTreeLayoutAlgorithm) viewer.getGraphControl()
+//						.getLayoutAlgorithm()).down();
+//				viewer.applyLayout();
+//				break;
+//			case 104:
+//				// button 'H' for horizontal
+//				viewer.toggleHorizontal();
+//				if(horizontalStyle) {
+//					horizontalStyle = !horizontalStyle;
+//					viewer.setLayoutAlgorithm(
+//							new LayeredTreeLayoutAlgorithm(
+//									LayoutStyles.NO_LAYOUT_NODE_RESIZING,
+//									leafingStyle), true);
+//				} else {
+//					horizontalStyle = !horizontalStyle;
+//					viewer.setLayoutAlgorithm(
+//							new LayeredHorizontalTreeLayoutAlgorithm(
+//									LayoutStyles.NO_LAYOUT_NODE_RESIZING,
+//									leafingStyle), true);
+//				}
+//
+//				for(Object o : viewer.getGraphControl().getNodes()) {
+//					if(o instanceof ClickableGraphNode) {
+//						ClickableGraphNode node = (ClickableGraphNode) o;
+//						node.addTogglerClickedListener(toggleHandler);
+//					}
+//				}
+
+//				for(GraphNode g : collapsedNodes) {
+//
+//					//works not because the nodes are other instances with same 
+//					//internal element --> use findGraphItem(...)
+//					toggleVisibility(g, true, true);
+//				}
+//			break;
+			}
+		}
+	};
+
+	private KeyListener shiftDetector = new KeyAdapter() {
+
+		@Override
+		public void keyPressed(KeyEvent e) {
+
+			shiftKeyPressed = e.keyCode == 131072 ? true : shiftKeyPressed;
+		}
+
+		@Override
+		public void keyReleased(KeyEvent e) {
+
+			shiftKeyPressed = e.keyCode == 131072 ? false : shiftKeyPressed;
+		}
+	};
+
+	@Override
+	public void addSelectionChangedListener(ISelectionChangedListener listener) {
+
+		viewer.addSelectionChangedListener(listener);
+	}
+
+	@Override
+	public void removeSelectionChangedListener(
+			ISelectionChangedListener listener) {
+
+		viewer.removeSelectionChangedListener(listener);
+	}
+
+// ==== PRIVATE CLASS DRAGLISTENER =============================================	
+
+	private class DragListener implements MouseListener, MouseMotionListener {
+
+		private final Point INVALID_POS = new Point(-1, -1);
+		private Point pos;
+		private Point curMsLoc;
+		private Point oldMsLoc;
+
+		private boolean rightBtn, isDragging;
+		RangeModel hM, vM;
+
+		public DragListener() {
+
+			pos = new Point(0, 0);
+			oldMsLoc = INVALID_POS.getCopy();
+			curMsLoc = INVALID_POS.getCopy();
+			isDragging = false;
+			hM = viewer.getGraphControl().getViewport()
+					.getHorizontalRangeModel();
+			vM = viewer.getGraphControl().getViewport().getVerticalRangeModel();
+		}
+
+		@Override
+		public void mouseDoubleClicked(MouseEvent me) {
+
+		}
+
+		@Override
+		public void mousePressed(MouseEvent me) {
+
+			isDragging = true;
+			if(me.button == 3) {
+				rightBtn = true;
+			} else {
+				rightBtn = false;
+			}
+			pos = new Point(hM.getValue(), vM.getValue());
+			curMsLoc = new Point(me.x, me.y);
+			oldMsLoc = INVALID_POS.getCopy();
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent me) {
+
+			isDragging = false;
+			curMsLoc = INVALID_POS.getCopy();
+			oldMsLoc = INVALID_POS.getCopy();
+		}
+
+		@Override
+		public void mouseDragged(MouseEvent me) {
+
+			if(isDragging && rightBtn) {
+
+				if(!oldMsLoc.equals(INVALID_POS)
+						&& !curMsLoc.equals(INVALID_POS)) {
+
+					curMsLoc = new Point(me.x, me.y);
+
+					Point diff = new Point(curMsLoc.x - oldMsLoc.x, curMsLoc.y
+							- oldMsLoc.y);
+
+					pos.x -= diff.x;
+					pos.y -= diff.y;
+
+					if(pos.x < 0) {
+						pos.x = 0;
+					}
+					if(pos.y < 0) {
+						pos.y = 0;
+					}
+
+					viewer.getGraphControl().scrollSmoothTo(pos.x, pos.y);
+
+					if(pos.x > hM.getValue()) {
+						pos.x = hM.getValue();
+					}
+					if(pos.y > vM.getValue()) {
+						pos.y = vM.getValue();
+					}
+				}
+
+				oldMsLoc = new Point(curMsLoc);
+			}
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent me) {
+
+		}
+
+		@Override
+		public void mouseExited(MouseEvent me) {
+
+		}
+
+		@Override
+		public void mouseHover(MouseEvent me) {
+
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent me) {
+
+		}
+	}
+
+// ==== PRIVATE CLASS TREE NAVIGATION ==========================================
+
+	private class TreeNavigation {
+
+		TreeNavigation() {
+
+			viewer.addSelectionChangedListener(selChgListener);
+		}
+
+		private void processKey(KeyId key) {
+
+			if(viewer.getGraphControl().getSelection().isEmpty()) {
+				cur = root;
+				scroller.performScroll(cur, ScrollAction.SHIFT);
+				viewer.getGraphControl().setSelection(new GraphItem[] { cur });
+			} else {
+				switch(key) {
+				case KEY_UP:
+					upShift();
+					break;
+				case KEY_DOWN:
+					downShift();
+					break;
+				case KEY_LEFT:
+					sideShift(true);
+					break;
+				case KEY_RIGHT:
+					sideShift(false);
+					break;
+				}
+			}
+			scroller.performScroll(cur, ScrollAction.SHIFT);
+			viewer.getGraphControl().setSelection(new GraphItem[] { cur });
+		}
+
+		private void upShift() {
+
+			List<GraphConnection> tConn = cur.getTargetConnections();
+			if(!tConn.isEmpty()) {
+				cur = tConn.get(0).getSource();
+			}
+		}
+
+		private void downShift() {
+
+			List<GraphConnection> sConn = cur.getSourceConnections();
+			if(collapsedNodes.contains(cur)) {
+				toggleAction(cur);
+			}
+			if(!sConn.isEmpty()) {
+				cur = sConn.get(0).getDestination();
+			}
+		}
+
+		private void sideShift(boolean left) {
+
+			int index = getIndex(sortedNodes, cur);
+			NodeInfo ngb = null;
+			while((left && index < sortedNodes.size() - 1 || !left && index > 0)
+					&& ngb == null) {
+				index += left ? 1 : -1;
+				if(sortedNodes.get(index).node.isVisible()) {
+					ngb = sortedNodes.get(index);
+				}
+			}
+			if(ngb != null) {
+				cur = ngb.node;
+			}
+		}
+
+		private ISelectionChangedListener selChgListener = new ISelectionChangedListener() {
+
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+
+				StructuredSelection s = (StructuredSelection) event
+						.getSelection();
+				if(!s.isEmpty()) {
+					GraphItem item = viewer.findGraphItem(s.getFirstElement());
+					if(item instanceof GraphNode) {
+						cur = (GraphNode) viewer.findGraphItem(s
+								.getFirstElement());
+						scroller.performScroll(cur, ScrollAction.CLICK);
+						setSelection(s);
+					}
+				}
+			}
+		};
+	}
+
+// ==== PRIVATE CLASS NODE INFO ================================================
+
+	private class NodeInfo {
+
+		GraphNode node;
+		int level;
+		int count;
+
+		public NodeInfo(GraphNode node, int level, int count) {
+
+			this.node = node;
+			this.level = level;
+			this.count = count;
+		}
+
+		public String toString() {
+
+			return String.format("%s(lvl %d, ct %d)", node, level, count);
+		}
+	}
+
+	private int getIndex(List<NodeInfo> nodes, GraphNode n) {
+
+		for(int i = 0; i < nodes.size(); i++) {
+			if(nodes.get(i).node.equals(n)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+}

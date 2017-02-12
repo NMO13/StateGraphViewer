@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StateModels>
+<Statemodel name="Key_pos">
+<State name="Ignition_off">
+<expr value="key_pos == 0"/>
+</State>
+<State name="Steering_free_ignition_off">
+<expr value="key_pos == 1"/>
+</State>
+<OrState name="OrState0">
+<State name="Ignitionaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
+<expr value="key_pos == 2"/>
+</State>
+<State name="Starting">
+<expr value="key_pos == 3"/>
+</State>
+</OrState>
+<OrState name="OrState1">
+	<OrState name="OrState11">
+		<State name="State111aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"/>
+		<OrState name="OrState1111">
+			<State name="State1111">
+				<expr value="expression1"/>
+			</State>
+			<State name="Use_Of_Ellipsis AAAAAAAAAA">
+				<expr value="expression2"/>
+			</State>
+		</OrState>	
+		<State name="State112"/>
+		<State name="State113"/>
+		<State name="State114"/>
+	</OrState>
+	<State name="State2"/>
+</OrState>
+<OrState name="OrState1111">
+	<State name="State1456">
+		<expr value="expression1"/>
+	</State>
+	<State name="Use_Of_Ellipsis AAAAAAAAAA">
+		<expr value="expression2"/>
+	</State>
+</OrState>
+<Transition>
+<source>
+<State name="Ignitionaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"/>
+</source>
+<target>
+<State name="State12345"/>
+</target>
+</Transition>
+<Transition>
+<source>
+<State name="Ignitionaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"/>
+</source>
+<target>
+<State name="State113"/>
+</target>
+</Transition>
+<Transition>
+<source>
+<State name="OrState11111"/>
+</source>
+<target>
+<State name="State113"/>
+</target>
+</Transition>
+<Transition>
+<source>
+<State name="State114"/>
+</source>
+<target>
+<State name="State113"/>
+</target>
+</Transition>
+<Transition>
+<source>
+<State name="State114"/>
+</source>
+<target>
+<State name="State112"/>
+</target>
+</Transition>
+<Transition>
+<source>
+<State name="Steering_free_ignition_off"/>
+</source>
+<target>
+<State name="State112"/>
+</target>
+</Transition>
+<Transition>
+<source>
+<State name="State2"/>
+</source>
+<target>
+<State name="Ignition_off"/>
+</target>
+</Transition>
+<Transition>
+<source>
+<State name="State1456"/>
+</source>
+<target>
+<State name="Starting"/>
+</target>
+</Transition>
+</Statemodel>
+</StateModels>
